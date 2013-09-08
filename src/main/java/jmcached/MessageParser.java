@@ -11,7 +11,11 @@ public class MessageParser {
 
     public Message parse(byte[] readBytes) {
         final String message = new String(readBytes);
-        final String[] split = message.split(" ", 4);
+        final String[] parts = message.split("\r\n", 2);
+
+        final String[] header = parts[0].split(" ");
+
+        final String[] split = message.split(" ", 5);
         log.info("splitted = " + Arrays.toString(split));
         final String cmd = split[0];
         final String key = split[1].trim();
@@ -21,14 +25,15 @@ public class MessageParser {
         if(split.length > 2) {
             final int flags = Integer.parseInt(split[2]);
             final String others = split[3];
+            log.info("others = " + others);
             final String[] split1 = split[3].split("\r\n");
             final String value = split1[1];
             log.info("value = " + value);
 
-            return new Message(cmd, key, flags, 0, value);
+            return new Message(cmd, key, flags, 0, length, value);
         }
 
-        return new Message(cmd, key, 0, 0, null);
+        return new Message(cmd, key, 0, 0, 0, null);
     }
 
 }
